@@ -1,6 +1,5 @@
 package com.mapper;
 
-
 import com.dto.MedicalRecordDto;
 import com.dto.CreateMedicalRecordDto;
 import com.dto.UpdateMedicalRecordDto;
@@ -13,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", 
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MedicalRecordMapper {
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "animal.id", source = "animalId")
     @Mapping(target = "veterinarian.id", source = "veterinarianId")
     MedicalRecord toEntity(CreateMedicalRecordDto createMedicalRecordDto);
@@ -22,6 +22,8 @@ public interface MedicalRecordMapper {
     @Mapping(target = "veterinarianName", expression = "java(medicalRecord.getVeterinarian().getFirstName() + \" \" + medicalRecord.getVeterinarian().getLastName())")
     MedicalRecordDto toDto(MedicalRecord medicalRecord);
     
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "animal", ignore = true)
     @Mapping(target = "veterinarian.id", source = "veterinarianId")
     void updateEntity(UpdateMedicalRecordDto updateMedicalRecordDto, @MappingTarget MedicalRecord medicalRecord);
 }

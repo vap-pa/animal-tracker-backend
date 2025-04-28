@@ -1,0 +1,1 @@
+<Typography variant="h5">{stats?.animals ?? 0}</Typography> 

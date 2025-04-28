@@ -11,6 +11,9 @@ import com.model.Animal;
 import com.repository.AnimalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +26,8 @@ public class AnimalService {
 
     public List<AnimalDto> getAllAnimals() {
         return animalRepository.findAll().stream()
-                .map(animalMapper::toDto)
-                .collect(Collectors.toList());
+            .map(animalMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     public AnimalDto getAnimalById(Long id) {
@@ -35,6 +38,15 @@ public class AnimalService {
 
     public AnimalDto createAnimal(CreateAnimalDto createAnimalDto) {
         Animal animal = animalMapper.toEntity(createAnimalDto);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof User user) {
+            animal.setOwner(user);
+        } else if (createAnimalDto.getOwnerId() != null) {
+            // For admin use
+            User owner = new User();
+            owner.setId(createAnimalDto.getOwnerId());
+            animal.setOwner(owner);
+        }
         Animal savedAnimal = animalRepository.save(animal);
         return animalMapper.toDto(savedAnimal);
     }

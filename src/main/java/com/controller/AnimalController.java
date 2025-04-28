@@ -12,7 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -29,8 +34,12 @@ public class AnimalController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String ownerName) {
-        List<AnimalDto> animals = animalService.searchAnimals(name, type, status, ownerName);
-        return ResponseEntity.ok(animals);
+        try {
+            List<AnimalDto> animals = animalService.searchAnimals(name, type, status, ownerName);
+            return ResponseEntity.ok(animals != null ? animals : Collections.emptyList());
+        } catch (Exception e) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
     }
 
     @GetMapping("/{id}")
@@ -61,5 +70,20 @@ public class AnimalController {
     public ResponseEntity<Void> deleteAnimal(@PathVariable Long id) {
         animalService.deleteAnimal(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<String> uploadAnimalImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String uploadsDir = System.getProperty("user.dir") + "/uploads/";
+            Files.createDirectories(Paths.get(uploadsDir));
+            String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadsDir, filename);
+            Files.write(filePath, file.getBytes());
+            String imageUrl = "/uploads/" + filename;
+            return ResponseEntity.ok(imageUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to upload image");
+        }
     }
 }

@@ -17,4 +17,6 @@ public class CreateAnimalDto {
     private LocalDate admissionDate;
     private String ownerName;
     private String ownerContact;
+    private Long ownerId; // Optional: set by admin, ignored for normal users
+    private String imageUrl;
 }

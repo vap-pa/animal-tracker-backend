@@ -13,4 +13,5 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
     List<Animal> findByType(String type);
     List<Animal> findByStatus(String status);
     List<Animal> findByOwnerNameContainingIgnoreCase(String ownerName);
+    List<Animal> findByOwner_Id(Long ownerId);
 }

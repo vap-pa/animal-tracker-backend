@@ -11,5 +11,6 @@ public class UpdateMedicalRecordDto {
     private String diagnosis;
     private String treatment;
     private String notes;
+    private String status;
     private Long veterinarianId;
 }

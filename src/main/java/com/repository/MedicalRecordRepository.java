@@ -11,4 +11,5 @@ import java.util.List;
 public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Long> {
     List<MedicalRecord> findByAnimalId(Long animalId);
     List<MedicalRecord> findByProcedureTypeContainingIgnoreCase(String procedureType);
+    long countByStatus(String status);
 }

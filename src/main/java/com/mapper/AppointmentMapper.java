@@ -1,6 +1,5 @@
 package com.mapper;
 
-
 import com.dto.AppointmentDto;
 import com.dto.CreateAppointmentDto;
 import com.dto.UpdateAppointmentDto;
@@ -13,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", 
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AppointmentMapper {
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "animal.id", source = "animalId")
     @Mapping(target = "veterinarian.id", source = "veterinarianId")
     Appointment toEntity(CreateAppointmentDto createAppointmentDto);
@@ -23,6 +23,8 @@ public interface AppointmentMapper {
     @Mapping(target = "veterinarianName", expression = "java(appointment.getVeterinarian().getFirstName() + \" \" + appointment.getVeterinarian().getLastName())")
     AppointmentDto toDto(Appointment appointment);
     
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "animal", ignore = true)
     @Mapping(target = "veterinarian.id", source = "veterinarianId")
     void updateEntity(UpdateAppointmentDto updateAppointmentDto, @MappingTarget Appointment appointment);
 }

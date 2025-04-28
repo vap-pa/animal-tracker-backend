@@ -12,5 +12,6 @@ public class CreateMedicalRecordDto {
     private String diagnosis;
     private String treatment;
     private String notes;
+    private String status;
     private Long veterinarianId;
 }

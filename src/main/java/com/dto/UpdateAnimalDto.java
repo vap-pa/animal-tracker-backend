@@ -16,4 +16,5 @@ public class UpdateAnimalDto {
     private LocalDate birthDate;
     private String ownerName;
     private String ownerContact;
+    private String imageUrl;
 }

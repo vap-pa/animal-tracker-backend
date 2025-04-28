@@ -32,12 +32,17 @@ public class Animal {
     private String microchipNumber;
     private LocalDate birthDate;
     private LocalDate admissionDate;
+    private String imageUrl;
 
     @Column(nullable = false)
     private String ownerName;
 
     @Column(nullable = false)
     private String ownerContact;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User owner;
 
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedicalRecord> medicalRecords;

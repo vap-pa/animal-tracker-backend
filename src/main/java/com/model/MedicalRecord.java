@@ -31,6 +31,7 @@ public class MedicalRecord {
     private String diagnosis;
     private String treatment;
     private String notes;
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veterinarian_id")

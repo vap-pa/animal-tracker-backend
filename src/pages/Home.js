@@ -1,0 +1,1 @@
+value={stats?.animals ?? 0} 

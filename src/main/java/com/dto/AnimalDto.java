@@ -20,6 +20,9 @@ public class AnimalDto {
     private LocalDate admissionDate;
     private String ownerName;
     private String ownerContact;
+    private Long ownerId;
+    private String ownerUsername;
+    private String imageUrl;
     private List<MedicalRecordDto> medicalRecords;
     private List<AppointmentDto> appointments;
 }

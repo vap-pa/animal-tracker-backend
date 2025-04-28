@@ -1,6 +1,5 @@
 package com.dto;
 
-
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -14,6 +13,7 @@ public class MedicalRecordDto {
     private String diagnosis;
     private String treatment;
     private String notes;
+    private String status;
     private Long veterinarianId;
     private String veterinarianName;
 }
