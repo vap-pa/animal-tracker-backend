@@ -1,5 +1,5 @@
 -- This file is intentionally left empty
--- All test data has been removed
+-- All test data has been removed 
 
 -- Drop all tables
 DROP TABLE IF EXISTS medical_records;
@@ -81,4 +81,4 @@ CREATE TABLE medical_records (
     veterinarian_id BIGINT,
     FOREIGN KEY (animal_id) REFERENCES animals(id),
     FOREIGN KEY (veterinarian_id) REFERENCES staff(id)
-);
+); 

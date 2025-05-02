@@ -14,11 +14,15 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface StaffMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "medicalRecords", ignore = true)
+    @Mapping(target = "appointments", ignore = true)
     Staff toEntity(CreateStaffDto createStaffDto);
     
     StaffDto toDto(Staff staff);
     
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "hireDate", ignore = true)
+    @Mapping(target = "medicalRecords", ignore = true)
+    @Mapping(target = "appointments", ignore = true)
     void updateEntity(UpdateStaffDto updateStaffDto, @MappingTarget Staff staff);
 }

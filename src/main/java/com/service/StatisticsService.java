@@ -8,4 +8,5 @@ public interface StatisticsService {
     Map<String, Long> getAnimalsByType();
     Map<String, Long> getAppointmentsByStatus();
     Map<String, Long> getEmergencyCases();
+    byte[] generateReport(String reportType, String format);
 } 

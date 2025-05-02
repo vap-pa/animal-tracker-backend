@@ -11,13 +11,13 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", 
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {MedicalRecordMapper.class, AppointmentMapper.class})
+        uses = {MedicalRecordMapper.class, AppointmentMapper.class, UserMapper.class})
 public interface AnimalMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "medicalRecords", ignore = true)
     @Mapping(target = "appointments", ignore = true)
     @Mapping(target = "admissionDate", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "owner", source = "ownerId", qualifiedByName = "idToUser")
     @Mapping(target = "imageUrl", source = "imageUrl")
     Animal toEntity(CreateAnimalDto createAnimalDto);
     

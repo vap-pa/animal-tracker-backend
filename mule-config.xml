@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+                          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+                          http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <!-- Database Configuration -->
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="13b757e5-ff5f-476f-be6f-434c2a88b4f7">
+        <db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="portcostsimulator" />
+    </db:config>
+
+    <!-- HTTP Listener Configuration -->
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="006b8302-8cfb-43e4-be29-9908a31b7ea4">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+
+    <!-- Flow for Fetching Users -->
+    <flow name="mulelocalsqldemoFlow" doc:id="eeab486c-9c7e-4d77-8583-e3e2a25deb33">
+        <http:listener doc:name="Listener" doc:id="9d6cbc78-0fa5-4860-abe9-9c060dba7e64" path="/users" config-ref="HTTP_Listener_config"/>
+        <db:select doc:name="Select" doc:id="945902a6-e1a1-4e78-b1df-1957ca3d545a" config-ref="Database_Config">
+            <db:sql><![CDATA[SELECT * FROM users;]]></db:sql>
+        </db:select>
+        <ee:transform doc:name="Transform Message" doc:id="c0ee6b7f-8b56-4fc2-8a75-f6ab9791fc41">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/json
+                    ---
+                    payload
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow for Fetching Roles -->
+    <flow name="fetchRolesFlow" doc:id="a16e3699-daf5-4351-b737-eebb6fda0f21">
+        <http:listener doc:name="Roles Listener" doc:id="34db1b1f-4202-4fb7-a02b-c9f51748c93a" path="/roles" config-ref="HTTP_Listener_config"/>
+        <db:select doc:name="Select Roles" doc:id="50816e3c-25a8-4224-9de3-006bf5267d3a" config-ref="Database_Config">
+            <db:sql><![CDATA[
+                SELECT 
+                    role_id, 
+                    created_at, 
+                    role_name, 
+                    updated_at, 
+                    role_display_name, 
+                    created_by, 
+                    updated_by, 
+                    version 
+                FROM roles;
+            ]]></db:sql>
+        </db:select>
+        <ee:transform doc:name="Transform Roles Response" doc:id="a3c5a061-d545-4b98-a469-520d498ffd53">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/json
+                    ---
+                    payload
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow for Users + Matched Roles -->
+    <flow name="fetchUsersWithRolesFlow" doc:id="76efad6e-6528-499f-9de4-45e8a9e24141">
+        <http:listener doc:name="User with Role Listener" doc:id="aae89ca9-3616-434f-ade8-ff9ad5044eff" path="/user_roles" config-ref="HTTP_Listener_config"/>
+        
+        <!-- Step 1: Get All Users -->
+        <db:select doc:name="Select Users" doc:id="52786483-425a-41ee-a427-92526fb1327a" config-ref="Database_Config">
+            <db:sql><![CDATA[
+                SELECT * FROM users;
+            ]]></db:sql>
+        </db:select>
+        
+        <ee:transform doc:name="Save Users" doc:id="65cd63a8-1cc8-4c1d-a4e6-997bc4737900">
+            <ee:variables>
+                <ee:set-variable variableName="users">
+                    <![CDATA[
+                        %dw 2.0
+                        output application/java
+                        ---
+                        payload
+                    ]]>
+                </ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+        <!-- Step 2: Get All Roles -->
+        <db:select doc:name="Select Roles" doc:id="93004823-8aa7-4e6d-962d-abb6c216a6b8" config-ref="Database_Config">
+            <db:sql><![CDATA[
+                SELECT * FROM roles;
+            ]]></db:sql>
+        </db:select>
+        
+        <!-- Step 3: Merge Users with Role Info -->
+        <ee:transform doc:name="Merge Users and Roles" doc:id="3e3241aa-d62c-4830-9f8f-811f0bbdf303">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/json
+                    var rolesMap = payload groupBy ((item) -> item.role_id)
+                    ---
+                    vars.users map ((user) -> do {
+                        var userRole = rolesMap[user.role_id][0] default {}
+                        ---
+                        {
+                            username: user.username,
+                            firstname: user.firstname,
+                            surname: user.surname,
+                            role_id: user.role_id,
+                            role: if (isEmpty(userRole)) null else {
+                                role_name: userRole.role_name,
+                                role_display_name: userRole.role_display_name
+                            }
+                        }
+                    })
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+</mule> 
