@@ -35,12 +35,14 @@ const Animals = () => {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'details'
     const [formData, setFormData] = useState({
         name: '',
-        species: '',
+        type: '',
         breed: '',
         birthDate: '',
-        gender: '',
         status: '',
-        description: ''
+        weight: '',
+        microchipNumber: '',
+        ownerName: '',
+        ownerContact: ''
     });
     const navigate = useNavigate();
 
@@ -104,12 +106,14 @@ const Animals = () => {
         setSelectedAnimal(null);
         setFormData({
             name: '',
-            species: '',
+            type: '',
             breed: '',
             birthDate: '',
-            gender: '',
             status: '',
-            description: ''
+            weight: '',
+            microchipNumber: '',
+            ownerName: '',
+            ownerContact: ''
         });
         setOpenDialog(true);
     };
@@ -119,14 +123,17 @@ const Animals = () => {
         setSelectedAnimal(animal);
         setFormData({
             name: animal.name,
-            species: animal.species,
+            type: animal.type,
             breed: animal.breed,
             birthDate: animal.birthDate?.split('T')[0] || '',
-            gender: animal.gender,
             status: animal.status,
-            description: animal.description
+            weight: animal.weight,
+            microchipNumber: animal.microchipNumber,
+            ownerName: animal.ownerName,
+            ownerContact: animal.ownerContact
         });
         setOpenDialog(true);
+        setViewMode('list'); // Switch back to list view when editing
     };
 
     const handleViewAnimal = (e, animal) => {
@@ -153,12 +160,14 @@ const Animals = () => {
         setSelectedAnimal(null);
         setFormData({
             name: '',
-            species: '',
+            type: '',
             breed: '',
             birthDate: '',
-            gender: '',
             status: '',
-            description: ''
+            weight: '',
+            microchipNumber: '',
+            ownerName: '',
+            ownerContact: ''
         });
     };
 
@@ -241,13 +250,22 @@ const Animals = () => {
 
             {viewMode === 'details' && selectedAnimal ? (
                 <Box>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setViewMode('list')}
-                        sx={{ mb: 2 }}
-                    >
-                        Back to List
-                    </Button>
+                    <Box display="flex" gap={2} mb={2}>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setViewMode('list')}
+                        >
+                            Back to List
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<EditIcon />}
+                            onClick={(e) => handleEditAnimal(e, selectedAnimal)}
+                        >
+                            Edit Animal
+                        </Button>
+                    </Box>
                     <Card>
                         <CardContent>
                             <Typography variant="h4" gutterBottom>
@@ -359,9 +377,9 @@ const Animals = () => {
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
-                                    label="Species"
-                                    name="species"
-                                    value={formData.species}
+                                    label="Type"
+                                    name="type"
+                                    value={formData.type}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -389,11 +407,11 @@ const Animals = () => {
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
-                                    label="Gender"
-                                    name="gender"
-                                    value={formData.gender}
+                                    label="Weight"
+                                    name="weight"
+                                    type="number"
+                                    value={formData.weight}
                                     onChange={handleInputChange}
-                                    required
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -406,15 +424,33 @@ const Animals = () => {
                                     required
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
-                                    label="Description"
-                                    name="description"
-                                    value={formData.description}
+                                    label="Microchip Number"
+                                    name="microchipNumber"
+                                    value={formData.microchipNumber}
                                     onChange={handleInputChange}
-                                    multiline
-                                    rows={4}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Owner Name"
+                                    name="ownerName"
+                                    value={formData.ownerName}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Owner Contact"
+                                    name="ownerContact"
+                                    value={formData.ownerContact}
+                                    onChange={handleInputChange}
+                                    required
                                 />
                             </Grid>
                         </Grid>
